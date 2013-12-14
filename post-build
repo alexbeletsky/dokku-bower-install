@@ -5,11 +5,8 @@ APP="$1";  IMAGE="$2"
 COMMAND=$(cat <<EOF
 PATH=$PATH:/app/vendor/node/bin &&
 cd /app &&
-if [[ -f ./bower.json ]]; then
-	echo "-----> Bower dependency detected" &&
-	npm install -g bower &&
-	bower install
-fi
+npm install -g bower &&
+bower install
 EOF
 )
 

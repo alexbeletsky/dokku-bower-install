@@ -10,6 +10,6 @@ bower install
 EOF
 )
 
-id=$(docker run -d $IMAGE /bin/bash -c "$COMMAND")
+id=$(docker run -i $IMAGE /bin/bash -c "$COMMAND")
 test $(docker wait $id) -eq 0
 docker commit $id $IMAGE > /dev/null

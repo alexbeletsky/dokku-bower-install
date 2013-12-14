@@ -2,14 +2,24 @@
 set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
 APP="$1";  IMAGE="$2"
 
-COMMAND=$(cat <<EOF
+BOWERINSTALL=$(cat <<EOF
 PATH=$PATH:/app/vendor/node/bin &&
 cd /app &&
-npm install -g bower &&
-bower install
+npm install bower
 EOF
 )
 
-id=$(docker run -i $IMAGE /bin/bash -c "$COMMAND")
+PACKAGESINSTALL=$(cat <<EOF
+cd /app &&
+./node_modules/bower/bin/bower install
+EOF
+)
+
+echo '-----> Installing bower'
+id=$(docker run -i $IMAGE /bin/bash -c "$BOWERINSTALL")
+test $(docker wait $id) -eq 0
+docker commit $id $IMAGE > /dev/null
+echo '-----> Installing bower packages'
+id=$(docker run -i $IMAGE /bin/bash -c "$PACKAGESINSTALL")
 test $(docker wait $id) -eq 0
 docker commit $id $IMAGE > /dev/null

@@ -10,6 +10,7 @@ EOF
 )
 
 PACKAGESINSTALL=$(cat <<EOF
+PATH=$PATH:/app/vendor/node/bin &&
 cd /app &&
 ./node_modules/bower/bin/bower install
 EOF

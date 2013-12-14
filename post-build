@@ -16,10 +16,12 @@ EOF
 )
 
 echo '-----> Installing bower'
-id=$(docker run -i $IMAGE /bin/bash -c "$BOWERINSTALL")
+id=$(docker run -d $IMAGE /bin/bash -c "$BOWERINSTALL")
+docker attach $id
 test $(docker wait $id) -eq 0
 docker commit $id $IMAGE > /dev/null
 echo '-----> Installing bower packages'
-id=$(docker run -i $IMAGE /bin/bash -c "$PACKAGESINSTALL")
+id=$(docker run -d $IMAGE /bin/bash -c "$PACKAGESINSTALL")
+docker attach $id
 test $(docker wait $id) -eq 0
 docker commit $id $IMAGE > /dev/null

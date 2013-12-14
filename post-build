@@ -2,15 +2,17 @@
 set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
 APP="$1";  IMAGE="$2"
 
-# detect bower file, in case it exists run bower install
-ret=$(docker run -i $IMAGE /bin/bash -c  "if [[ -f /app/bower.json ]]; then echo 'bower'; fi")
-if [[  "$ret" == "bower" ]]; then
+COMMAND=$(cat <<EOF
+PATH=$PATH:/app/vendor/node/bin
+cd /app
+if [[ -f ./bower.json ]]; then
 	echo "-----> Bower dependency detected"
-	id=$(docker run -i $IMAGE /bin/bash -c "npm install -g bower")
-	test $(docker wait $id) -eq 0
-	docker commit $id $IMAGE > /dev/null
-	id=$(docker run -i $IMAGE /bin/bash -c "cd /app && bower install")
-	test $(docker wait $id) -eq 0
-	docker commit $id $IMAGE > /dev/null
+	npm install -g bower
+	bower install
 fi
+EOF
+)
 
+id=$(docker run -d $IMAGE /bin/bash -c "$COMMAND")
+test $(docker wait $id) -eq 0
+docker commit $id $IMAGE > /dev/null

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
+APP="$1";  IMAGE="$2"
+
+BOWERSCRIPT="
+#!/usr/bin/env bash
+cd /app
+if [[ -f ./bower.json ]]; then
+	echo'-----> Detected bower dependency'
+	npm install bower
+	echo'-----> Installing bower packages'
+	./node_modules/bower/bin/bower install --allow-root
+fi
+"
+
+echo '------> Injecting bower script'
+id=$(echo $BOWERSCRIPT | docker run -d -a stdin $IMAGE /bin/bash -c "cat > /app/.bower")
+docker attach $id
+test $(docker wait $id) -eq 0
+docker commit $id $IMAGE > /dev/null
+id=$(docker run -d /bin/bash -c "chmod +x /app/.bower")
+docker attach $id
+test $(docker wait $id) -eq 0
+docker commit $id $IMAGE > /dev/null

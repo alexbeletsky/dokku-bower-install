@@ -2,7 +2,8 @@
 set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
 APP="$1";  IMAGE="$2"
 
-id=$(docker run -i $IMAGE /bin/bash -c "/app/bower")
+echo '-----> Running bower script'
+id=$(docker run -d $IMAGE /bin/bash -c "/app/.bower")
 docker attach $id
 test $(docker wait $id) -eq 0
 docker commit $id $IMAGE > /dev/null

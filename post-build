@@ -6,7 +6,7 @@ BOWERSCRIPT="
 #!/bin/bash
 
 cd /app
-PATH=\$PATH:/app/vendor/node/bin
+PATH=\$PATH:/app/vendor/node/bin:/app/.heroku/node/bin
 if [[ -f ./bower.json ]]; then
 	npm install -g bower && bower install --allow-root
 fi
